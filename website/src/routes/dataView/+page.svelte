@@ -1,7 +1,5 @@
 <script>
 
-    // Menu
-	import Menu from '$lib/menu.svelte'
 
     // Imports
 	import highcharts from '$lib/highcharts';
@@ -87,7 +85,6 @@
 </script>
 
 
-<Menu />
 <main>
 
 {#if sensorData.length === 0}
