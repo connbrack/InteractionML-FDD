@@ -10,10 +10,8 @@ import {
     Toggle,
     Modal,
     Label,
-    Toast,
     Textarea,
     Radio,
-    Alert
 } from 'flowbite-svelte';
 
 import {
@@ -38,16 +36,11 @@ onMount(async () => {
 // ------------------------ UI elements -----------------------------
 let DropdownIsOpen = false;
 let graphModeSelect = false;
-let selectDataButtonLabel = "zoom mode";
-let showDataLabelForm = false;
 let showPopup = false;
-let textareaprops = {
-    id: 'message',
-    name: 'message',
-    label: 'Your message',
-    rows: 4,
-    placeholder: 'Leave a comment...'
-};
+let showDataLabelForm = false;
+let textareaprops = {};
+let selectedOption = '';
+let notes = '';
 
 const dropdownClick = async (sensor) => {
     currentSensor = sensor;
@@ -59,7 +52,7 @@ const closeDropdown = () => {
     DropdownIsOpen = false;
 };
 
-const labelDataButton = () => {
+const labelDataButton = async (event) => {
     if (selectedData == undefined) {
         showPopup = true;
         setTimeout(() => {
@@ -70,7 +63,11 @@ const labelDataButton = () => {
     }
 };
 
-function handleClick() {}
+const submitDataButton = async (event) => {
+    event.preventDefault();
+    await submitDataLabel();
+    showDataLabelForm = false;
+}
 
 // ------------------------ API functions ------------------------------
 
@@ -87,6 +84,18 @@ const getSensorData = async () => {
     const response = await fetch(`${serverIP}/sensor_data?sensor=${currentSensor}`)
     const data = await response.json();
     sensorData = data;
+}
+
+const submitDataLabel = async () => {
+    const response = await fetch(`${serverIP}/apply_data_label`, {
+        method: 'POST',
+        body: JSON.stringify({
+            option: selectedOption,
+            notes: notes,
+            selectedData: selectedData
+        })
+    })
+    const result = await response.json();
 }
 
 // ------------------------ Graph ------------------------------
@@ -132,7 +141,7 @@ let config = {
 // ------------------------ Graph click functions -----------
 
 function selectPointsByDrag(e) {
-    selectedData = e.xAxis;
+    selectedData = [e.xAxis[0].min, e.xAxis[0].max];
     config.series[0].zoneAxis = 'x';
     config.xAxis.plotBands = [{
         from: e.xAxis[0].min,
@@ -223,7 +232,6 @@ function selectDataClick() {
             click: unselectByClick
         };
         graphModeSelect = true;
-        selectDataButtonLabel = "select mode";
     } else {
         config.chart.events = {
             selection: undefined,
@@ -231,7 +239,6 @@ function selectDataClick() {
             click: undefined
         };
         graphModeSelect = false;
-        selectDataButtonLabel = "zoom mode";
     }
 };
 </script>
@@ -252,7 +259,6 @@ function selectDataClick() {
             <DropdownItem on:click={() => dropdownClick(sensorName['label'])}>{sensorName['name']}</DropdownItem>
             {/each}
         </Dropdown>
-
     </div>
 
     <br /><br />
@@ -268,17 +274,17 @@ function selectDataClick() {
 
     <!------------------------------- Popup elements ---------------------------------------->
     <Modal bind:open={showDataLabelForm} size="xs" autoclose={false} class="w-full">
-        <form class="flex flex-col space-y-6">
+        <form class="flex flex-col space-y-6" on:submit={submitDataButton}>
             <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Label Data</h3>
             <Label class="space-y-2">
                 Select an option
-                <Radio name="example" checked={true}>Faulty Data</Radio>
-                <Radio name="example">Unfaulty Data</Radio>
-                <Radio name="example">Remove all labels from selection</Radio>
+                <Radio name="example" bind:group={selectedOption} value="Faulty Data">Faulty Data</Radio>
+                <Radio name="example" bind:group={selectedOption} value="Unfaulty Data">Unfaulty Data</Radio>
+                <Radio name="example" bind:group={selectedOption} value="Remove all labels from selection">Remove all labels from selection</Radio>
             </Label>
             <Label class="space-y-2">
                 <span>Notes</span>
-                <Textarea {...textareaprops} />
+                <Textarea {...textareaprops} bind:value={notes} />
             </Label>
             <Button type="submit" class="w-full1">Submit</Button>
         </form>
