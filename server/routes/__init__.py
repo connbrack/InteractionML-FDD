@@ -16,7 +16,7 @@ def create_app():
     db.init_app(app)
 
     from .data import data
-    from .models import User, Note, initialize_database
+    from .models import User, Note, initialize_database, FaultLabel
 
     # app.register_blueprint(auth)
     app.register_blueprint(data)

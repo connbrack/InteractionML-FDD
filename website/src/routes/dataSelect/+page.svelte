@@ -149,21 +149,6 @@ function selectPointsByDrag(e) {
         color: 'rgba(69, 167, 255, 0.5)'
     }, ]
 
-    this.series.forEach(series => {
-        series.points.forEach(point => {
-            if (point.x >= e.xAxis[0].min && point.x <= e.xAxis[0].max) {
-                point.select(true, true);
-            }
-        });
-    });
-
-    Highcharts.fireEvent(
-        this,
-        'selectedpoints', {
-            points: this.getSelectedPoints()
-        }
-    );
-
     return false;
 }
 
@@ -171,42 +156,6 @@ function unselectByClick() {
     selectedData = undefined;
     config.series[0].zoneAxis = [];
     config.xAxis.plotBands = [];
-    const points = this.getSelectedPoints();
-    if (points.length > 0) {
-        points.forEach(point => point.select(false));
-    }
-}
-
-function toast(chart, text) {
-    chart.toast = chart.renderer.label(text, 100, 120)
-        .attr({
-            fill: Highcharts.getOptions().colors[0],
-            padding: 10,
-            r: 5,
-            zIndex: 8
-        })
-        .css({
-            color: '#FFFFFF'
-        })
-        .add();
-
-    setTimeout(function() {
-        chart.toast.fadeOut();
-    }, 2000);
-    setTimeout(function() {
-        chart.toast = chart.toast.destroy();
-    }, 2500);
-}
-/*
- * The handler for a custom event, fired from selection event
- */
-function selectedPoints(e) {
-    // Show a label
-    toast(
-        this,
-        `<b>${e.points.length} points selected.</b>
-        <br>Click on empty space to deselect.`
-    );
 }
 
 // ------------------------ Graph UI changes -----------
@@ -228,7 +177,7 @@ function selectDataClick() {
     if (graphModeSelect == false) {
         config.chart.events = {
             selection: selectPointsByDrag,
-            selectedpoints: selectedPoints,
+            // selectedpoints: selectedPoints,
             click: unselectByClick
         };
         graphModeSelect = true;
