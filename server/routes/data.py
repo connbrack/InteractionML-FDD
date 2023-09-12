@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, send_from_directory
 from flask_login import login_required, current_user
-from .models import Defaults
+from .models import Defaults, FaultLabel
 from . import db
 import pandas as pd
+import datetime
 import json
 
 data = Blueprint('data', __name__)
@@ -60,3 +61,18 @@ def change_sensor():
 
     return jsonify({})
 
+
+@data.route('/apply_data_label', methods=['POST'])
+def apply_data_label():  
+    post_data = json.loads(request.data)
+    
+    fault_data = FaultLabel(
+        range_start=post_data['selectedData'][0],
+        range_end=post_data['selectedData'][1],
+        fault_label=post_data['option'],
+        notes=post_data['notes']
+        )
+    db.session.add(fault_data)
+    db.session.commit()
+
+    return jsonify({})
