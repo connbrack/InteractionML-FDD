@@ -49,6 +49,15 @@ class Defaults(db.Model):
         return f'id: {self.id}, view_sensor: {self.view_sensor}'
 
 
+class FaultLabel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    range_start = db.Column(db.Integer)
+    range_end = db.Column(db.Integer)
+    fault_label = db.Column(db.String(10000))
+    notes = db.Column(db.String(10000))
+
+    def __repr__(self):
+        return f'id: {self.id}, range_start: {self.range_start}, range_end: {self.range_end}, fault_label: {self.fault_label}, notes: {self.notes}'
 
 
 # class equipment(db.Model):
