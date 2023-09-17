@@ -52,7 +52,7 @@ const closeDropdown = () => {
     DropdownIsOpen = false;
 };
 
-const labelDataButton = async (event) => {
+const labelDataButton = async () => {
     if (selectedData == undefined) {
         showPopup = true;
         setTimeout(() => {
@@ -66,7 +66,12 @@ const labelDataButton = async (event) => {
 const submitDataButton = async (event) => {
     event.preventDefault();
     await submitDataLabel();
+
+    // Clear form 
     showDataLabelForm = false;
+    selectedOption = '';
+    notes = '';
+    config.xAxis.plotBands = [];
 }
 
 // ------------------------ API functions ------------------------------
