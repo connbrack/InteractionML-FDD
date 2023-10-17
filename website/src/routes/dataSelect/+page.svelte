@@ -1,7 +1,6 @@
 <script>
 // Imports
 import chart from '$lib/highcharts';
-import Highcharts from 'highcharts';
 import {
     Button,
     Dropdown,
@@ -13,24 +12,27 @@ import {
     Textarea,
     Radio,
 } from 'flowbite-svelte';
-
 import {
     Icon,
 } from 'flowbite-svelte-icons';
-
 import {
-    onMount
+    onMount,
 } from 'svelte'
-
+import{
+    get
+} from 'svelte/store'
 import {
-    serverIP
+    serverIP,
+    persistentDataSensor
 } from '$lib/localstore.js';
 
 // ------------------------ Page initialization -----------------------------
 onMount(async () => {
     getAHUsensors();
     await getSensorData();
+    await getFaultLabel();
     updateGraph()
+    updateDataBands()
 });
 
 // ------------------------ UI elements -----------------------------
@@ -44,6 +46,7 @@ let notes = '';
 
 const dropdownClick = async (sensor) => {
     currentSensor = sensor;
+    persistentDataSensor.set(sensor);
     closeDropdown();
     await getSensorData();
     updateGraph();
@@ -71,14 +74,17 @@ const submitDataButton = async (event) => {
     showDataLabelForm = false;
     selectedOption = '';
     notes = '';
-    config.xAxis.plotBands = [];
+    selectedData = undefined;
+    await getFaultLabel();
+    updateDataBands()
 }
 
 // ------------------------ API functions ------------------------------
 
-let currentSensor = "MA_TEMP";
+let currentSensor = get(persistentDataSensor);
 let sensorData = [];
 let AHUsensors = [];
+let labeled_ranges = [];
 
 const getAHUsensors = async () => {
     const response = await fetch(`${serverIP}/AHU_sensor_info`)
@@ -92,7 +98,7 @@ const getSensorData = async () => {
 }
 
 const submitDataLabel = async () => {
-    const response = await fetch(`${serverIP}/apply_data_label`, {
+    await fetch(`${serverIP}/apply_data_label`, {
         method: 'POST',
         body: JSON.stringify({
             option: selectedOption,
@@ -100,12 +106,17 @@ const submitDataLabel = async () => {
             selectedData: selectedData
         })
     })
-    const result = await response.json();
+}
+
+const getFaultLabel = async () => {
+    const response = await fetch(`${serverIP}/label_data`)
+    const data = await response.json();
+    labeled_ranges = data;
 }
 
 // ------------------------ Graph ------------------------------
 
-let selectedData = undefined;
+let selectedData = [];
 let config = {
     chart: {
         type: "line",
@@ -148,19 +159,18 @@ let config = {
 function selectPointsByDrag(e) {
     selectedData = [e.xAxis[0].min, e.xAxis[0].max];
     config.series[0].zoneAxis = 'x';
-    config.xAxis.plotBands = [{
+    config.xAxis.plotBands[0] = {
         from: e.xAxis[0].min,
         to: e.xAxis[0].max,
         color: 'rgba(69, 167, 255, 0.5)'
-    }, ]
+    };
 
     return false;
 }
 
 function unselectByClick() {
     selectedData = undefined;
-    config.series[0].zoneAxis = [];
-    config.xAxis.plotBands = [];
+    config.xAxis.plotBands[0] = [];
 }
 
 // ------------------------ Graph UI changes -----------
@@ -177,6 +187,24 @@ function updateGraph() {
         }
     };
 };
+
+function updateDataBands() {
+    config.xAxis.plotBands = []
+    config.xAxis.plotBands[0] = {}
+    let index = 1;
+    while (labeled_ranges[index] !== undefined) {
+        config.xAxis.plotBands[index] = {
+            from: labeled_ranges[index]['range_start'],
+            to: labeled_ranges[index]['range_end'],
+        }
+        if (labeled_ranges[index]['fault_label'] == 'faulty') {
+            config.xAxis.plotBands[index].color = 'rgba(249, 128, 128, .5)'
+        } else{
+            config.xAxis.plotBands[index].color = 'rgba(67, 160, 71, .5)'
+        }
+        index++
+    }
+}
 
 function selectDataClick() {
     if (graphModeSelect == false) {
@@ -234,7 +262,7 @@ function selectDataClick() {
                 Select an option
                 <Radio name="example" bind:group={selectedOption} value="Faulty Data">Faulty Data</Radio>
                 <Radio name="example" bind:group={selectedOption} value="Unfaulty Data">Unfaulty Data</Radio>
-                <Radio name="example" bind:group={selectedOption} value="Remove all labels from selection">Remove all labels from selection</Radio>
+                <!-- <Radio name="example" bind:group={selectedOption} value="Remove all labels from selection">Remove all labels from selection</Radio> -->
             </Label>
             <Label class="space-y-2">
                 <span>Notes</span>
