@@ -5,5 +5,5 @@ import { writable } from 'svelte/store';
 export const serverIP = 'http://127.0.0.1:5000';
 
 //View Data
-export const viewDataSensor = writable('SA_TEMP');
+export const persistentDataSensor = writable('SA_TEMP');
 export const viewDataSensorData = writable([]);
