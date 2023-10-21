@@ -24,10 +24,12 @@ $: activeUrl = $page.url.pathname;
             <NavLi href="/">Home</NavLi>
             <NavLi href="/dataView">View Data</NavLi>
             <NavLi href="/dataSelect">Select Data</NavLi>
+            <NavLi href="/timeSim">Time Adjuster</NavLi>
         </NavUl>
     </Navbar>
 </main>
 <hr style="width:100%;text-align:left;margin-left:0">
+
 <style>
 main {
     padding: 2px;
