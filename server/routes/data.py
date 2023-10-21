@@ -65,14 +65,27 @@ def change_sensor():
 @data.route('/apply_data_label', methods=['POST'])
 def apply_data_label():  
     post_data = json.loads(request.data)
+
+    fault_key = {'Faulty Data': 'faulty', 'Unfaulty Data': 'unfaulty'}
     
     fault_data = FaultLabel(
         range_start=post_data['selectedData'][0],
         range_end=post_data['selectedData'][1],
-        fault_label=post_data['option'],
+        fault_label=fault_key[post_data['option']],
         notes=post_data['notes']
         )
     db.session.add(fault_data)
     db.session.commit()
 
     return jsonify({})
+
+
+@data.route('/label_data', methods=['GET'])
+def label_data():  
+    
+    fault_labels = pd.read_sql_query('SELECT * FROM fault_label', db.engine)
+    fault_labels.index = fault_labels.index + 1
+
+    output = fault_labels.to_dict(orient='index')
+
+    return jsonify(output)
