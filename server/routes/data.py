@@ -8,7 +8,6 @@ import json
 
 data = Blueprint('data', __name__)
 
-
 @data.route('/defaults', methods=['GET'])
 def defaults():
 
@@ -26,6 +25,14 @@ def sensor_info():
 
     return jsonify(output)
 
+@data.route('/AHU_fault_list', methods=['GET'])
+def AHU_fault_list():
+
+    df = pd.read_sql_query('SELECT * FROM faults', db.engine, index_col=None)
+    output = df.to_dict(orient='index')
+
+    return jsonify(output)
+
 
 @data.route('/sensor_data', methods=['GET'])
 def sensor_data():  
@@ -35,9 +42,9 @@ def sensor_data():
     df = pd.read_sql_query('SELECT * FROM AHU_info', db.engine)
     sensor_info = df[df['label'] == plot_sensor]
 
-    df = pd.read_sql_query('SELECT * FROM AHU_data', db.engine, parse_dates=['index'])
-    df['index'] = (df['index'].astype(int) / 1000000).astype(int)
-    df = df.set_index('index')
+    df = pd.read_sql_query('SELECT * FROM AHU_data', db.engine, parse_dates=['Datetime'])
+    df['Datetime'] = (df['Datetime'].astype(int) / 1000000).astype(int)
+    df = df.set_index('Datetime')
     df_plot = df[plot_sensor]
     data = [[k,v] for k,v in df_plot.items()]
 
