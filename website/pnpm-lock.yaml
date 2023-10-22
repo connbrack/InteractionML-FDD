@@ -23,6 +23,12 @@ devDependencies:
   highcharts:
     specifier: ^11.1.0
     version: 11.1.0
+  i:
+    specifier: ^0.3.7
+    version: 0.3.7
+  moment:
+    specifier: ^2.29.4
+    version: 2.29.4
   postcss:
     specifier: ^8.4.24
     version: 8.4.31
@@ -35,6 +41,9 @@ devDependencies:
   svelte-check:
     specifier: ^2.9.2
     version: 2.10.3(postcss-load-config@4.0.1)(postcss@8.4.31)(svelte@3.59.2)
+  svelte-range-slider-pips:
+    specifier: ^2.2.3
+    version: 2.2.3
   tailwindcss:
     specifier: ^3.3.2
     version: 3.3.3
@@ -767,6 +776,11 @@ packages:
     resolution: {integrity: sha512-vhmqq6/frteWMx0GKYWwEFL25g4OYc7+m+9KQJb/notXbNtIb8KVy+ijOF7XAFqF165cq0pdLIePAmyFY5ph3g==}
     dev: true
 
+  /i@0.3.7:
+    resolution: {integrity: sha512-FYz4wlXgkQwIPqhzC5TdNMLSE5+GS1IIDJZY/1ZiEPCT2S3COUVZeT5OW4BmW4r5LHLQuOosSwsvnroG9GR59Q==}
+    engines: {node: '>=0.4'}
+    dev: true
+
   /immutable@4.3.4:
     resolution: {integrity: sha512-fsXeu4J4i6WNWSikpI88v/PcVflZz+6kMhUfIwc5SY+poQRPnaf5V7qds6SUyUN3cVxEzuCab7QIoLOQ+DQ1wA==}
     dev: true
@@ -900,6 +914,10 @@ packages:
     hasBin: true
     dependencies:
       minimist: 1.2.8
+    dev: true
+
+  /moment@2.29.4:
+    resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
     dev: true
 
   /mri@1.2.0:
@@ -1295,6 +1313,10 @@ packages:
       strip-indent: 3.0.0
       svelte: 3.59.2
       typescript: 4.9.5
+    dev: true
+
+  /svelte-range-slider-pips@2.2.3:
+    resolution: {integrity: sha512-ZAwX9+NDOE6cdqUTMfwBw27YI7NFgSXyPS1ARx3Zuaish2q6FuAtgx5d9+uqNzxQ7WVFhxgM7iQp8MvCpvy4Jw==}
     dev: true
 
   /svelte@3.59.2:
